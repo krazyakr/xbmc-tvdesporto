@@ -1,0 +1,17 @@
+<addon id="plugin.video.tvdesporto" name="TV Desporto" provider-name="Avenger" version="0.1.10">   
+ <requires>
+  <import addon="xbmc.python" version="2.0">   
+ </import></requires>   
+ <extension library="default.py" point="xbmc.python.pluginsource">   
+  <provides>video</provides>   
+ </extension>   
+ <extension point="xbmc.addon.metadata">   
+  <language>en</language>   
+  <platform>all</platform>   
+  <summary lang="en">TVs Portuguesas de Desporto</summary>   
+  <description lang="en">TVs Portuguesas de Desporto
+  
+  Visita os sites oficiais</description>   
+  <platform>all</platform>   
+ </extension>   
+</addon>  

@@ -1,0 +1,27 @@
+<channels>
+	<channel name="Benfica TV" icon="bentv-ver2.png">
+		<providers>
+			<provider type="veetle" name="SportTVHDMI.com" link="http://cdn.sporttvhdmi.com/iframes/Sporttv2-veetle-iframe.php" />
+		</providers>
+	</channel>
+	<channel name="SportTV 1" icon="sptv1-ver2.png">
+		<providers>
+			<provider type="veetle" name="SportTVHDMI.com" link="http://cdn.sporttvhdmi.com/iframes/Sporttv1-veetle-iframe.php" />
+		</providers>
+	</channel>
+	<channel name="SportTV 2" icon="sptv2-ver2.png">
+		<providers>
+			<provider type="veetle" name="SportTVHDMI.com" link="http://cdn.sporttvhdmi.com/iframes/Sporttv2-veetle-iframe.php" />
+		</providers>
+	</channel>
+	<channel name="SportTV 3" icon="sptv3-ver2.png">
+		<providers>
+			
+		</providers>
+	</channel>
+	<channel name="SportTV Live" icon="sptvlive-ver1.png">
+		<providers>
+			<provider type="veetle" name="SportTVHDMI.com" link="http://cdn.sporttvhdmi.com/iframes/Sporttv2-veetle-iframe.php" />
+		</providers>
+	</channel>
+</channels>
