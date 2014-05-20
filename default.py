@@ -1,6 +1,7 @@
 import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon
+import streams
 
-#TVs Portuguesas by Avenger 2014.
+#TVs Portuguesas by krazyakr 2014.
 
 def CATEGORIES():
         addDir('Desporto',basepath,1,logopath)
@@ -16,24 +17,8 @@ def VIDEOLINKS(url,name):
         providers=getChannelProviders(url)
         for rawData in providers:
                 provider=getProviderInfo(rawData)
-                if provider[0]=='veetle':
-                        veetleID=getVeetleId(provider[2])
-                        if veetleID != 'NULL':
-                                streamfile='plugin://plugin.video.veetle/?channel=' + veetleID
-                                print "Added stream: " + streamfile
-                                addLink(provider[1],streamfile,'')
-                if provider[0]=='flash':
-                        print "Flash Channel: " + provider[1] + " | " + provider[2]
-                        link=requestLink(provider[2])
-                        if re.search('var urls = new Array',link):
-                                framedupla=re.compile('new Array.+?"(.+?)".+?"(.+?)"').findall(link)[0]
-                                if framedupla[0]==framedupla[1]:
-                                        print "1 stream only"
-                                else:
-                                        print "2 streams: " + framedupla[0] + " | " + framedupla[1]
-                        else:
-                                print "1 stream only"
-                
+                streams.addStream(provider)
+
 def get_params():
         param=[]
         paramstring=sys.argv[2]
@@ -49,7 +34,6 @@ def get_params():
                         splitparams=pairsofparams[i].split('=')
                         if (len(splitparams))==2:
                                 param[splitparams[0]]=splitparams[1]
-                                
         return param
 
 
@@ -88,30 +72,8 @@ def getChannelProviders(rawData):
     return match
 
 def getProviderInfo(rawData):
-    match=re.compile('type="(.+?)" name="(.+?)" link="(.+?)"').findall(rawData)
+    match=re.compile('type="(.+?)" source="(.+?)" name="(.+?)" link="(.+?)"').findall(rawData)
     return match[0]
-
-def getVeetleId(url):
-        link=requestLink(url)
-        match=re.compile('<iframe.+?src="http://veetle.com/index.php/widget/index/(.+?)/0/true/default/false"></iframe>').findall(link)
-        idembed=match[0]
-        print "ID embed: " + idembed
-        try:
-                chname=requestLink('http://fightnightaddons.x10.mx/tools/veet.php?id=' + idembed)
-                chname=chname.replace(' ','')
-                if re.search('DOCTYPE HTML PUBLIC',chname):
-                        return 'NULL'
-                print "ID final obtido pelo TvM."
-        except:
-                chname=requestLink('http://fightnight-xbmc.googlecode.com/svn/veetle/sporttvhdid.txt')
-                print "ID final obtido pelo txt."
-        print "ID final: " + chname
-        link=requestLink('http://veetle.com/index.php/channel/ajaxStreamLocation/'+chname+'/flash')
-        if re.search('"success":false',link):
-                return 'NULL'
-        else:
-                return chname
-        return chname
       
 params=get_params()
 url=None
