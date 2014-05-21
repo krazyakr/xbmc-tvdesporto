@@ -55,10 +55,10 @@ def getVeetleId(url):
         print "ID final obtido pelo txt."
     print "ID final: " + chname
     link=requestLink('http://veetle.com/index.php/channel/ajaxStreamLocation/'+chname+'/flash')
-##    if re.search('"success":false',link):
-##        return 'NULL'
-##    else:
-##        return chname
+    if re.search('"success":false',link):
+        return 'NULL'
+    else:
+        return chname
     return chname
 
 def addStream(provider):
@@ -74,21 +74,30 @@ def addStream(provider):
         if re.search('var urls = new Array',link):
             framedupla=re.compile('new Array.+?"(.+?)".+?"(.+?)"').findall(link)[0]
             if framedupla[0]==framedupla[1]:
-                streamfile = getFlashStreamUrl(provider[1],framedupla[0])
+                streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
+                if streamfile!='': addLink(provider[2],streamfile,'')
             else:
-                streamfile = getFlashStreamUrl(provider[1],framedupla[0])
-                addLink(provider[2]+" #1",streamfile,'')
-                streamfile = getFlashStreamUrl(provider[1],framedupla[1])
-                addLink(provider[2]+" #2",streamfile,'')
+                streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
+                if streamfile!='': addLink(provider[2]+" #1",streamfile,'')
+                streamfile = getFlashStreamUrl(provider[1],framedupla[1],False)
+                if streamfile!='': addLink(provider[2]+" #2",streamfile,'')
         else:
-            print "not implemented"
-                    
-    return ''
+            streamfile = getFlashStreamUrl(provider[1],provider[3],False)
+            if streamfile!='': addLink(provider[2],streamfile,'')
 
-def getFlashStreamUrl(source,url_frame):
-    link = requestLink(url_frame)
+def getFlashStreamUrl(source,url_frame,content):
+    if content==False:
+        link = requestLink(url_frame)
+    else:
+        link = content
 
+    # Clean up garbage
+    link=link.replace('<title>Zuuk.net</title>','').replace('http://s.zuuk.net/300x250.html','').replace('www.zuuk.net\/test.php?ch=','').replace('cdn.zuuk.net\/boi.php','').replace('cdn.zuuk.net\/stats.php','').replace('cdn.zuuk.net/boi.php','').replace('cdn.zuuk.net/stats.php','').replace('<p><script language="JavaScript"> setTimeout','<p><script language="JavaScript">setTimeout')
+
+    print link
+    
     if re.search('ucaster', link):
+        print "Stream: ucaster"
         ucaster=re.compile("channel='(.+?)',.+?></script>").findall(link)
         if not ucaster: ucaster=re.compile('flashvars="id=.+?&s=(.+?)&g=1&a=1&l=').findall(link)
         if not ucaster: ucaster=re.compile('src="/ucaster.eu.php.+?fid=(.+?)" id="innerIframe"').findall(link)
@@ -99,7 +108,6 @@ def getFlashStreamUrl(source,url_frame):
 
         for chname in ucaster:
             embed='http://www.ucaster.eu/embedded/' + chname + '/1/600/430'
-            print embed
             try:
                 ref_data = {'Referer': url_frame,'User-Agent':user_agent}
                 html= abrir_url_tommy(embed,ref_data)
@@ -123,6 +131,7 @@ def getFlashStreamUrl(source,url_frame):
             return streamurl
 
     elif re.search('mips', link):
+        print "Stream: mips"
         mips=re.compile("channel='(.+?)',.+?></script>").findall(link)
         if not mips: mips=re.compile('channel="(.+?)",.+?></script>').findall(link)
         if not mips: mips=re.compile('<iframe src="/mips.tv.php.+?fid=(.+?)" id="innerIframe"').findall(link)
@@ -144,5 +153,38 @@ def getFlashStreamUrl(source,url_frame):
             rtmpendereco=re.compile(".*redirect=([\.\d]+).*").findall(link)[0]
             streamurl='rtmp://' + rtmpendereco + '/live/ playPath=' + nocanal + '?id=' + chid + ' swfVfy=1 live=true timeout=15 conn=S:OK swfUrl=http://www.mips.tv' + swf + ' pageUrl=' + embed
             return streamurl
+
+    elif re.search('zuuk.net', link):
+        print "Stream: zuuk.net"
+        if re.search('<script type="text/javascript">var urls = new Array',link):
+            zuuk=re.compile('new Array.+?"(.+?)",').findall(link)[0]
+            _link = requestLink(zuuk)
+            try:
+                info=re.compile("<div id='mediaspace'>"+'<script language="javascript".+?' + "document.write.+?unescape.+?'(.+?)'").findall(_link)[0]
+                _info = urllib.unquote(info)
+                zuuk = re.compile('<script.+?type="text/javascript".+?src="(.+?)">').findall(_info)[0]
+                return getFlashStreamUrl(source,zuuk,_info)
+            except:
+                print "except"
+                print _link
+        else:
+            try: zuuk = re.compile('<iframe.+?src="(.+?)".+?/iframe>').findall(link)[0]
+            except: zuuk = re.compile("<iframe.+?src='(.+?)'.+?/iframe>").findall(link)[0]
+            return getFlashStreamUrl(source,zuuk,False)
+
+    elif re.search('ezcast.tv', link):
+        print "Stream: ezcast.tv"
+        chname = re.compile('<script.+?channel="(.+?)".+?/script>').findall(link)[0]
+        embed = "http://www.ezcast.tv/embedded/"+chname+"/1/650/500"
+        ref_data = {'Referer': url_frame,'User-Agent':user_agent}
+        html= abrir_url_tommy(embed,ref_data)
+        link=requestLink('http://www.ezcast.tv:1935/loadbalancer')
+        rtmpendereco=re.compile(".*redirect=([\.\d]+).*").findall(link)[0]
+        idnum=re.compile("'FlashVars'.+?id=(.+?)&s=.+?&").findall(html)[0]
+        chnum=re.compile("'FlashVars'.+?id=.+?&s=(.+?)&").findall(html)[0]
+        streamurl='rtmp://' + rtmpendereco + '/live playPath=' + chnum + '?id=' + idnum + ' swfUrl=http://www.ezcast.tv/static/scripts/eplayer.swf live=true conn=S:OK swfVfy=1 timeout=14 pageUrl=' + embed
+        return streamurl
+        
+    else: print "<<<<< Provider not supported >>>>>>"
     
     return ''
