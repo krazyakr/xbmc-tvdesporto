@@ -86,15 +86,15 @@ def addStream(provider):
             if streamfile!='': addLink(provider[2],streamfile,'')
 
 def getFlashStreamUrl(source,url_frame,content):
+    print "RAT: getFlashStreamUrl: url_frame = " + url_frame
+    
     if content==False:
         link = requestLink(url_frame)
     else:
         link = content
 
     # Clean up garbage
-    link=link.replace('<title>Zuuk.net</title>','').replace('http://s.zuuk.net/300x250.html','').replace('www.zuuk.net\/test.php?ch=','').replace('cdn.zuuk.net\/boi.php','').replace('cdn.zuuk.net\/stats.php','').replace('cdn.zuuk.net/boi.php','').replace('cdn.zuuk.net/stats.php','').replace('<p><script language="JavaScript"> setTimeout','<p><script language="JavaScript">setTimeout')
-
-    print link
+    link=link.replace('<title>Zuuk.net</title>','<title>Zuuk.net</title>').replace('http://s.zuuk.net/300x250.html','').replace('www.zuuk.net\/test.php?ch=','').replace('cdn.zuuk.net\/boi.php','').replace('cdn.zuuk.net\/stats.php','').replace('cdn.zuuk.net/boi.php','').replace('cdn.zuuk.net/stats.php','').replace('<p><script language="JavaScript"> setTimeout','<p><script language="JavaScript">setTimeout')
     
     if re.search('ucaster', link):
         print "Stream: ucaster"
@@ -164,9 +164,8 @@ def getFlashStreamUrl(source,url_frame,content):
                 _info = urllib.unquote(info)
                 zuuk = re.compile('<script.+?type="text/javascript".+?src="(.+?)">').findall(_info)[0]
                 return getFlashStreamUrl(source,zuuk,_info)
-            except:
-                print "except"
-                print _link
+            except RuntimeError as e:
+                print "except: " + e.strerror
         else:
             try: zuuk = re.compile('<iframe.+?src="(.+?)".+?/iframe>').findall(link)[0]
             except: zuuk = re.compile("<iframe.+?src='(.+?)'.+?/iframe>").findall(link)[0]
@@ -184,7 +183,14 @@ def getFlashStreamUrl(source,url_frame,content):
         chnum=re.compile("'FlashVars'.+?id=.+?&s=(.+?)&").findall(html)[0]
         streamurl='rtmp://' + rtmpendereco + '/live playPath=' + chnum + '?id=' + idnum + ' swfUrl=http://www.ezcast.tv/static/scripts/eplayer.swf live=true conn=S:OK swfVfy=1 timeout=14 pageUrl=' + embed
         return streamurl
-        
-    else: print "<<<<< Provider not supported >>>>>>"
+
+    elif re.search('tugastream.com', link):
+        print "Stream: tugastream.com"
+        tugastream=re.compile('<iframe.+?src="(.+?)".+?/iframe>').findall(link)[0]
+        return getFlashStreamUrl(source,tugastream,False)
+    
+    else:
+        #print link
+        print "<<<<< Provider not supported >>>>>>"
     
     return ''

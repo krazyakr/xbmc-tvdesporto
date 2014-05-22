@@ -9,6 +9,7 @@
 #rm -r tmp/plugin.video.tvdesporto/tmp
 #cd tmp
 cp -r source/* ~/.xbmc/addons/plugin.video.tvdesporto/
+ls -l ~/.xbmc/addons/plugin.video.tvdesporto/
 #cd ..
 #rm -r tmp
 
