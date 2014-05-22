@@ -1,17 +1,17 @@
-<addon id="plugin.video.tvdesporto" name="TV Desporto" provider-name="Avenger" version="0.1.10">   
- <requires>
-  <import addon="xbmc.python" version="2.0">   
- </import></requires>   
- <extension library="default.py" point="xbmc.python.pluginsource">   
-  <provides>video</provides>   
- </extension>   
- <extension point="xbmc.addon.metadata">   
-  <language>en</language>   
-  <platform>all</platform>   
-  <summary lang="en">TVs Portuguesas de Desporto</summary>   
-  <description lang="en">TVs Portuguesas de Desporto
-  
-  Visita os sites oficiais</description>   
-  <platform>all</platform>   
- </extension>   
-</addon>  
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.tvdesporto" name="TV Desporto" version="1.0.1" provider-name="krazyakr">
+    <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+	<import addon="script.module.urlresolver"  version="1.0.5"/>
+	<import addon="script.module.t0mm0.common" version="1.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>TVs Portuguesas de Desporto</summary>
+        <description>TVs Portuguesas de Desporto - Visita os sites oficiais</description>
+        <disclaimer>O autor deste addon NAO e responsavel pelo conteudo dos streams.</disclaimer>
+        <platform>all</platform>
+    </extension>
+</addon>
