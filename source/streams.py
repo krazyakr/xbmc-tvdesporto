@@ -86,7 +86,7 @@ def addStream(provider):
             if streamfile!='': addLink(provider[2],streamfile,'')
 
 def getFlashStreamUrl(source,url_frame,content):
-    print "RAT: getFlashStreamUrl: url_frame = " + url_frame
+    print "getFlashStreamUrl: url_frame = " + url_frame
     
     if content==False:
         link = requestLink(url_frame)
@@ -94,7 +94,7 @@ def getFlashStreamUrl(source,url_frame,content):
         link = content
 
     # Clean up garbage
-    link=link.replace('<title>Zuuk.net</title>','<title>Zuuk.net</title>').replace('http://s.zuuk.net/300x250.html','').replace('www.zuuk.net\/test.php?ch=','').replace('cdn.zuuk.net\/boi.php','').replace('cdn.zuuk.net\/stats.php','').replace('cdn.zuuk.net/boi.php','').replace('cdn.zuuk.net/stats.php','').replace('<p><script language="JavaScript"> setTimeout','<p><script language="JavaScript">setTimeout')
+    link=link.replace('<title>Zuuk.net</title>','<title>zuuk.net</title>').replace('http://s.zuuk.net/300x250.html','').replace('www.zuuk.net\/test.php?ch=','').replace('cdn.zuuk.net\/boi.php','').replace('cdn.zuuk.net\/stats.php','').replace('cdn.zuuk.net/boi.php','').replace('cdn.zuuk.net/stats.php','').replace('<p><script language="JavaScript"> setTimeout','<p><script language="JavaScript">setTimeout')
     
     if re.search('ucaster', link):
         print "Stream: ucaster"
@@ -159,6 +159,8 @@ def getFlashStreamUrl(source,url_frame,content):
         if re.search('<script type="text/javascript">var urls = new Array',link):
             zuuk=re.compile('new Array.+?"(.+?)",').findall(link)[0]
             _link = requestLink(zuuk)
+            print zuuk
+            print _link
             try:
                 info=re.compile("<div id='mediaspace'>"+'<script language="javascript".+?' + "document.write.+?unescape.+?'(.+?)'").findall(_link)[0]
                 _info = urllib.unquote(info)
@@ -190,7 +192,8 @@ def getFlashStreamUrl(source,url_frame,content):
         return getFlashStreamUrl(source,tugastream,False)
     
     else:
-        #print link
+        print "<<<<< Provider not supported >>>>>>"
+        print link
         print "<<<<< Provider not supported >>>>>>"
     
     return ''
