@@ -55,10 +55,10 @@ def getVeetleId(url):
         print "ID final obtido pelo txt."
     print "ID final: " + chname
     link=requestLink('http://veetle.com/index.php/channel/ajaxStreamLocation/'+chname+'/flash')
-    if re.search('"success":false',link):
-        return 'NULL'
-    else:
-        return chname
+    #if re.search('"success":false',link):
+    #    return 'NULL'
+    #else:
+    #    return chname
     return chname
 
 def addStream(provider):
@@ -85,6 +85,34 @@ def addStream(provider):
             streamfile = getFlashStreamUrl(provider[1],provider[3],False)
             if streamfile!='': addLink(provider[2],streamfile,'')
 
+def playStream(provider):
+    if provider[0]=='veetle':
+        veetleID=getVeetleId(provider[3])
+        if veetleID != 'NULL':
+            streamfile='plugin://plugin.video.veetle/?channel=' + veetleID
+            print "Added stream: " + streamfile
+            print streamfile
+    if provider[0]=='flash':
+        print "Flash Channel: " + provider[1] + " | " + provider[2] + " | " + provider[3]
+        link=requestLink(provider[3])
+        if re.search('var urls = new Array',link):
+            framedupla=re.compile('new Array.+?"(.+?)".+?"(.+?)"').findall(link)[0]
+            if framedupla[0]==framedupla[1]:
+                streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
+                if streamfile!='':
+                    print streamfile
+            else:
+                streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
+                if streamfile!='':
+                    print streamfile
+                streamfile = getFlashStreamUrl(provider[1],framedupla[1],False)
+                if streamfile!='':
+                    print streamfile
+        else:
+            streamfile = getFlashStreamUrl(provider[1],provider[3],False)
+            if streamfile!='':
+                print streamfile
+    
 def getFlashStreamUrl(source,url_frame,content):
     print "getFlashStreamUrl: url_frame = " + url_frame
     

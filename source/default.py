@@ -13,6 +13,17 @@ def INDEX(url):
                 channelInfo=getChannelInfo("<channel "+rawData+"</channel>")
                 addDir(channelInfo[0],channelInfo[2],2,artPath+channelInfo[1])
 
+def STREAMS(url,name):
+        providers=getChannelProviders(url)
+        for rawData in providers:
+                provider=getProviderInfo(rawData)
+                addDir(provider[2],rawData,3,artPath+name)
+
+def PLAYSTREAM(url,name):
+        data=getProviderInfo(url)
+        print data
+        streams.playStream(data)
+        
 def VIDEOLINKS(url,name):
         providers=getChannelProviders(url)
         for rawData in providers:
@@ -112,11 +123,17 @@ if mode==None or url==None or len(url)<1:
 elif mode==1:
         print "Mode 1:"+url
         INDEX(url)
+
+#elif mode==2:
+#        print "Mode 2: "+url
+#        VIDEOLINKS(url,name)
         
 elif mode==2:
         print "Mode 2: "+url
-        VIDEOLINKS(url,name)
+        STREAMS(url,name)
 
-
+elif mode==3:
+        print "Mode 3: "+url
+        PLAYSTREAM(url,name)
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
