@@ -92,6 +92,7 @@ def playStream(provider):
             streamfile='plugin://plugin.video.veetle/?channel=' + veetleID
             print "Added stream: " + streamfile
             print streamfile
+            addLink('Play',streamfile,'')
     if provider[0]=='flash':
         print "Flash Channel: " + provider[1] + " | " + provider[2] + " | " + provider[3]
         link=requestLink(provider[3])
@@ -101,17 +102,21 @@ def playStream(provider):
                 streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
                 if streamfile!='':
                     print streamfile
+                    addLink('Play',streamfile,'')
             else:
                 streamfile = getFlashStreamUrl(provider[1],framedupla[0],False)
                 if streamfile!='':
                     print streamfile
+                    addLink('Play #1',streamfile,'')
                 streamfile = getFlashStreamUrl(provider[1],framedupla[1],False)
                 if streamfile!='':
                     print streamfile
+                    addLink('Play #2',streamfile,'')
         else:
             streamfile = getFlashStreamUrl(provider[1],provider[3],False)
             if streamfile!='':
                 print streamfile
+                addLink('Play',streamfile,'')
     
 def getFlashStreamUrl(source,url_frame,content):
     print "getFlashStreamUrl: url_frame = " + url_frame
@@ -139,6 +144,7 @@ def getFlashStreamUrl(source,url_frame,content):
             try:
                 ref_data = {'Referer': url_frame,'User-Agent':user_agent}
                 html= abrir_url_tommy(embed,ref_data)
+                print html
                 swf=re.compile('SWFObject.+?"(.+?)",').findall(html)[0]
                 flashvars=re.compile("so.addParam.+?'FlashVars'.+?'(.+?);").findall(html)[0]
                 flashvars=flashvars.replace("')","&nada").split('l=&')
@@ -151,6 +157,7 @@ def getFlashStreamUrl(source,url_frame,content):
                 nocanal=nocanal.replace('&','')
             except:
                 nocanal=chname
+                print link
                 chid=re.compile("flashvars='id=(.+?)&s").findall(link)[0]
                 swf=re.compile("true' src='http://www.ucaster.eu(.+?)'").findall(link)[0]
             link=requestLink('http://www.ucaster.eu:1935/loadbalancer')
@@ -184,7 +191,15 @@ def getFlashStreamUrl(source,url_frame,content):
 
     elif re.search('zuuk.net', link):
         print "Stream: zuuk.net"
-        if re.search('<script type="text/javascript">var urls = new Array',link):
+        if re.search("<div id='mediaspace'>",link):
+            try:
+                info=re.compile("<div id='mediaspace'>"+'<script language="javascript".+?' + "document.write.+?unescape.+?'(.+?)'").findall(link)[0]
+                _info = urllib.unquote(info)
+                zuuk = re.compile('<script.+?type="text/javascript".+?src="(.+?)">').findall(_info)[0]
+                return getFlashStreamUrl(source,zuuk,_info)
+            except RuntimeError as e:
+                print "except: " + e.strerror
+        elif re.search('<script type="text/javascript">var urls = new Array',link):
             zuuk=re.compile('new Array.+?"(.+?)",').findall(link)[0]
             _link = requestLink(zuuk)
             print zuuk
