@@ -233,6 +233,32 @@ def getFlashStreamUrl(source,url_frame,content):
         print "Stream: tugastream.com"
         tugastream=re.compile('<iframe.+?src="(.+?)".+?/iframe>').findall(link)[0]
         return getFlashStreamUrl(source,tugastream,False)
+
+    elif re.search('streamify', link):
+        print "Catcher: streamify"
+        flive=re.compile('channel="(.+?)",.+?></script>').findall(link)
+        for chid in flive:
+            embed='http://www.streamify.tv/embedplayer/'+chid+'/1/650/400'
+            ref_data = {'Referer': url_frame,'User-Agent':user_agent}
+            html= abrir_url_tommy(embed,ref_data)
+            if re.search('Channel is domain protected.',html):
+                url_frame='http://www.streamify.tv/' + chname
+                ref_data = {'Referer': url_frame,'User-Agent':user_agent}
+                html= abrir_url_tommy(embed,ref_data)
+            swf=re.compile('SWFObject.+?"(.+?)",').findall(html)
+            flashvars=re.compile("so.addParam.+?'FlashVars'.+?'(.+?);").findall(html)[0]
+            flashvars=flashvars.replace("')","&nada").split('l=&')
+            if flashvars[1]=='nada':
+                nocanal=re.compile("&s=(.+?)&").findall(flashvars[0])[0]
+                chid=re.compile("id=(.+?)&s=").findall(html)[0]
+            else:
+                nocanal=re.compile("&s=(.+?)&nada").findall(flashvars[1])[0]
+                chid=re.compile("id=(.+?)&s=").findall(html)[1]
+            nocanal=nocanal.replace('&','')
+            link=requestLink('http://www.streamify.tv:1935/loadbalancer')
+            rtmpendereco=re.compile(".*redirect=([\.\d]+).*").findall(link)[0]
+            streamurl='rtmp://' + rtmpendereco + '/live/ app=live playPath=' + nocanal + '?id=' + chid + ' swfVfy=1 live=true swfUrl=http://www.streamify.tv' + swf[0] + ' pageUrl=' + embed
+            return streamurl
     
     else:
         print "<<<<< Provider not supported >>>>>>"

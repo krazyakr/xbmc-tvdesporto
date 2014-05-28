@@ -39,7 +39,7 @@ def abrir_url_tommy(url,referencia,form_data=None,erro=True):
             mensagemok('TV Desporto',"Erro na página.")
             sys.exit(0)
 
-url = "http://www.tvdez.com/embed.php?c=sporttv&height=500&width=650"
+url = "http://www.streamify.tv/resources/scripts/streamifyEmbed.js"
 link = requestLink(url)
 
 
