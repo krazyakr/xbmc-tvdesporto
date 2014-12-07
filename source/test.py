@@ -39,7 +39,18 @@ def abrir_url_tommy(url,referencia,form_data=None,erro=True):
             mensagemok('TV Desporto',"Erro na página.")
             sys.exit(0)
 
-url = "http://www.streamify.tv/resources/scripts/streamifyEmbed.js"
+url = "http://firstrowpt.eu/watch/137666/1/watch-espn.html"
 link = requestLink(url)
+if re.search('04stream',link):
+    #print 'here'
+    aux=re.compile('<script.+?src="http://www.04stream.com/embed.js?(.+?)".+?/script>').findall(link)
+    for sub in aux:
+        link2 = requestLink('http://www.04stream.com/embed.js?'+sub)
+        #print link2
+        aux2=re.compile('.+?src=(.+?)\'.+?').findall(link2)
+        #print aux2[0]+'firstrowpt.eu'
+        link3=requestLink(aux2[0]+'firstrowpt.eu')
+        print link3
+
 
 

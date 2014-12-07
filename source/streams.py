@@ -117,7 +117,12 @@ def playStream(provider):
             if streamfile!='':
                 print streamfile
                 addLink('Play',streamfile,'')
+
+def playStreamV2(url):
+    print 'Stream: ' + url
+    link=requestLink(url)
     
+
 def getFlashStreamUrl(source,url_frame,content):
     print "getFlashStreamUrl: url_frame = " + url_frame
     

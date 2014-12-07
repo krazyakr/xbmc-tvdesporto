@@ -1,28 +1,29 @@
 import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon
 import streams
 
-#TVs Portuguesas by krazyakr 2014.
+#TV Desporto by krazyakr 2014.
 
 def CATEGORIES():
-        addDir('Desporto',basepath,1,logopath)
+        link = requestLink(basepath)
+        categories = getCategories(link)
+        for category in categories:
+                addDir(category[1], basepath+category[0], 1, None)
                        
 def INDEX(url):
         link=requestLink(url)
-        match=re.compile('<channel (.+?)</channel>').findall(link)
-        for rawData in match:
-                channelInfo=getChannelInfo("<channel "+rawData+"</channel>")
-                addDir(channelInfo[0],channelInfo[2],2,artPath+channelInfo[1])
+        events = getEvents(link)
+        for rawData in events:
+                addDir(rawData[0],rawData[1],2,None)
 
 def STREAMS(url,name):
         providers=getChannelProviders(url)
+        i = 1
         for rawData in providers:
-                provider=getProviderInfo(rawData)
-                addDir(provider[2],rawData,3,artPath+name)
+                addDir('Link ' + str(i),rawData,3,None)
+                i = i + 1
 
 def PLAYSTREAM(url,name):
-        data=getProviderInfo(url)
-        print data
-        streams.playStream(data)
+        streams.playStreamV2(url)
         
 def VIDEOLINKS(url,name):
         providers=getChannelProviders(url)
@@ -74,13 +75,33 @@ def requestLink(url):
         link=link.replace('\n','')
         return link
 
+def getCategories(rawData):
+        match=re.compile('<div id="matchmenu">(.+?)</div>').findall(rawData)
+        match2 = re.compile('<li class=.+?> <a href="(.+?)">(.+?)</a> </li>').findall(match[0])
+        return match2
+
+def getEvents(rawData):
+        match=re.compile('<h3>(.+?)</div>').findall(rawData)
+        events = []
+        for rawData in match:
+                broadcasttime=re.compile('<span class="matchtime">(.+?)</span>').findall(rawData)
+                broadcastname=re.compile('<a.+?alt="(.+?)".+?</a>').findall(rawData)
+                if len(broadcasttime) > 0:
+                        events.append([broadcasttime[0] + ' - ' + broadcastname[0],rawData])
+                else:
+                        events.append([broadcastname[0],rawData])
+        return events
+        
 def getChannelInfo(rawData):
     match=re.compile('<channel name="(.+?)" icon="(.+?)">.+?<providers>(.+?)</providers>').findall(rawData)
     return match[0]
 
 def getChannelProviders(rawData):
-    match=re.compile('<provider (.+?)/>').findall(rawData)
-    return match
+        broadcastlinks=re.compile('<a.+?target=.+?href=\'(.+?)\'.+?</a>').findall(rawData)
+        links = []
+        for link in broadcastlinks:
+                links.append(basepath + link)
+        return links
 
 def getProviderInfo(rawData):
     match=re.compile('type="(.+?)" source="(.+?)" name="(.+?)" link="(.+?)"').findall(rawData)
@@ -90,7 +111,8 @@ params=get_params()
 url=None
 name=None
 mode=None
-basepath="http://mymediaboxcreation.blogspot.pt/2014/03/channels.html"
+#basepath="http://mymediaboxcreation.blogspot.pt/2014/03/channels.html"
+basepath="http://firstrowpt.eu"
 logopath="http://1.bp.blogspot.com/-j2_59w602G4/Uxn94vbEWII/AAAAAAAAEuo/TLqufuESJBo/s1600/logotipo.jpg"
 artPath=xbmcaddon.Addon(id='plugin.video.tvdesporto').getAddonInfo('path') + "/resources/art/"
 
@@ -108,9 +130,9 @@ except:
         pass
 
 # Start with the channels - No categories to show
-if mode==None:
-        mode=1
-        url=basepath
+#if mode==None:
+#        mode=1
+#        url=basepath
 
 print "Mode: "+str(mode)
 print "URL: "+str(url)
