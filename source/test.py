@@ -35,7 +35,7 @@ def abrir_url_tommy(url,referencia,form_data=None,erro=True):
             mensagemok('TV Desporto',"Erro na página.")
             sys.exit(0)
 
-url = "http://firstrowpt.eu/watch/304813/1/watch-real-valladolid-vs-recreativo-huelva.html"
+url = "http://firstrowpt.eu/watch/193916/1/watch-sky-sports-1.html"
 link = requestLink(url)
 
 if re.search('id="player"',link):
@@ -44,7 +44,6 @@ if re.search('id="player"',link):
     link2 = requestLink(aux[0])
     print link2
     
-        
 
 if re.search('04stream',link):
     #print 'here'
